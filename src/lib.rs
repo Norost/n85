@@ -80,7 +80,7 @@ pub enum DecodeError {
 #[cfg(feature = "alloc")]
 pub fn decode_vec(input: &[u8]) -> Result<Vec<u8>, DecodeVecError> {
 	let mut v = Vec::new();
-	v.resize(input.len() * 4 / 5 + usize::from(input.len() % 5 > 0), 0);
+	v.resize(input.len() * 4 / 5, 0);
 	decode(input, &mut v)
 		.map_err(|e| match e {
 			DecodeError::InvalidChar => DecodeVecError::InvalidChar,
