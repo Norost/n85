@@ -1,13 +1,4 @@
-//! # N85 binary-to-ASCII encoder and decoder.
-//!
-//! N85 is a custom Ascii85 variant optimized for little-endian architectures and the ASCII
-//! character set.
-//!
-//! Every 4 bytes of binary data maps to 5 characters.
-//! A number is 5 times divided by 85, which gives 5 remainders.
-//! These are mapped to a human-readable ASCII character by adding 40 (`(`).
-//! If the character is greater or equal to 92 (`\\`), 1 is added to it.
-
+#![doc = include_str!("../README.md")]
 #![cfg_attr(not(test), no_std)]
 #![forbid(unsafe_code, missing_docs)]
 #![feature(slice_as_chunks)]
