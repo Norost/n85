@@ -2,6 +2,13 @@
 name = "n85"
 version = "0.1.0"
 edition = "2021"
+license = "0BSD"
+repository = "https://github.com/Demindiro/n85"
+description = "N85 (Ascii85 variant) encoder & decoder"
+documentation = "https://docs.rs/n85"
+keywords = ["decode", "ascii85", "base85"]
+categories = ["encoding"]
+exclude = ["rustfmt.toml", "Cargo.lock"]
 
 [profile.release]
 lto = "fat"
