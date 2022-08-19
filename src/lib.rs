@@ -3,6 +3,12 @@
 #![forbid(unsafe_code, missing_docs)]
 #![feature(slice_as_chunks)]
 
+#[cfg(feature = "alloc")]
+extern crate alloc;
+
+#[cfg(feature = "alloc")]
+use alloc::{vec::Vec, string::String};
+
 /// Decode a N85 string.
 ///
 /// Note that even if decoding fails, the contents in `output` may be overwritten.
@@ -70,6 +76,33 @@ pub enum DecodeError {
 	OutputTooShort,
 }
 
+/// Decode into a [`Vec`].
+#[cfg(feature = "alloc")]
+pub fn decode_vec(input: &[u8]) -> Result<Vec<u8>, DecodeVecError> {
+	let mut v = Vec::new();
+	v.resize(input.len() * 4 / 5 + usize::from(input.len() % 5 > 0), 0);
+	decode(input, &mut v)
+		.map_err(|e| match e {
+			DecodeError::InvalidChar => DecodeVecError::InvalidChar,
+			DecodeError::InvalidLength => DecodeVecError::InvalidLength,
+			DecodeError::OutputTooShort => unreachable!(),
+		})
+		.map(|l| {
+			debug_assert_eq!(l, v.len());
+			v
+		})
+}
+
+/// Error returned if decoding failed.
+#[cfg(feature = "alloc")]
+#[derive(Clone, Copy, Debug)]
+pub enum DecodeVecError {
+	/// An invalid character was encountered.
+	InvalidChar,
+	/// The length is invalid, i.e. `input.len() % 5 == 1`, which is not possible.
+	InvalidLength,
+}
+
 /// Encode an arbitrary byte string.
 pub fn encode(input: &[u8], output: &mut [u8]) -> Result<usize, EncodeError> {
 	let out_len = input.len() * 5 / 4 + usize::from(input.len() % 4 >= 1);
@@ -124,6 +157,22 @@ pub fn encode(input: &[u8], output: &mut [u8]) -> Result<usize, EncodeError> {
 pub enum EncodeError {
 	/// The output buffer is too small to store the encoded string.
 	OutputTooShort,
+}
+
+/// Encode into a [`Vec`].
+#[cfg(feature = "alloc")]
+pub fn encode_vec(input: &[u8]) -> Vec<u8> {
+	let mut v = Vec::new();
+	v.resize(input.len() * 5 / 4 + usize::from(input.len() % 4 >= 1), 0);
+	let l = encode(input, &mut v).unwrap();
+	debug_assert_eq!(l, v.len());
+	v
+}
+
+/// Encode into a [`String`].
+#[cfg(feature = "alloc")]
+pub fn encode_string(input: &[u8]) -> String {
+	String::from_utf8(encode_vec(input)).unwrap()
 }
 
 fn dec(n: u8) -> u8 {

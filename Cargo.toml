@@ -7,3 +7,7 @@ edition = "2021"
 lto = "fat"
 strip = "symbols"
 codegen-units = 1
+
+[features]
+default = ["alloc"]
+alloc = []
